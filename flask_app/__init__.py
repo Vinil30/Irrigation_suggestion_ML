@@ -49,35 +49,28 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if not model or not column_transformer or not label_encoder:
-        return jsonify({'error': "Model or transformers not loaded."}), 500
-
     try:
-        # Get user input
-        crop_type = request.form.get('crop')
-        water_availability = request.form.get('water')
+        print("Received Data:", request.form)  # Debugging
+        crop_type = request.form['crop']
+        water_availability = request.form['water']
 
-        if not crop_type or not water_availability:
-            return jsonify({'error': "Missing input values."}), 400
-
-        # Convert input to numpy array
         user_input = np.array([[crop_type, water_availability]], dtype=object)
+        print("User Input:", user_input)
 
-        # Apply encoding
         transformed_input = column_transformer.transform(user_input)
+        print("Transformed Input:", transformed_input)
 
-        # Make prediction
         prediction = model.predict(transformed_input)
+        print("Prediction:", prediction)
 
-        # Decode prediction
         predicted_label = label_encoder.inverse_transform(prediction)
+        print("Predicted Label:", predicted_label)
 
-        # Return response
         return jsonify({'prediction': predicted_label[0]})
 
     except Exception as e:
         logging.error(f"Error during prediction: {e}")
-        return jsonify({'error': "Prediction failed. Check server logs."}), 500
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
