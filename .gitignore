@@ -7,6 +7,3 @@ __pycache__/
 .DS_Store
 *.log
 instance/
-model.pkl
-column_transformer.pkl
-label_encoder.pkl
