@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrigation Suggestion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Irrigation Suggestion</h2>
+        <form action="/predict" method="POST">
+            <label for="crop">Select Crop Type:</label>
+            <select id="crop" name="crop">
+
+                <option value="Crop Type" disabled selected>Crop Type</option>
+                <option value="maize">Maize</option>
+                <option value="sugarcane">Sugarcane</option>
+                <option value="cotton">Cotton</option>
+                <option value="tobacco">Tobacco</option>
+                <option value="paddy">Paddy</option>
+                <option value="barley">Barley</option>
+                <option value="wheat">Wheat</option>
+                <option value="millets">Millets</option>
+                <option value="oil seeds">Oil Seeds</option>
+                <option value="pulses">Pulses</option>
+                <option value="ground nuts">Ground Nuts</option>
+            </select>
+            
+            <label for="water">Water Availability:</label>
+            <select id="water" name="water">
+                <option value="Water Availability" disabled selected>Water Availability</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="high">High</option>
+            </select>
+            
+            <button type="submit">Get Suggestion</button>
+        </form>
+        <div id="prediction-result"></div>
+    </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('/predict', {
+                method: 'POST',
+                body: new FormData(this)
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.error) {
+                      document.getElementById('prediction-result').innerText = 'Error: ' + data.error;
+                  } else {
+                      document.getElementById('prediction-result').innerText = 'Prediction: ' + data.prediction;
+                  }
+              });
+        });
+    </script>
+</body>
+</html>

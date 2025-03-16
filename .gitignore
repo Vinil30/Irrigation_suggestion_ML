@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.vscode/
+.DS_Store
+*.log
+instance/
+model.pkl
+column_transformer.pkl
+label_encoder.pkl
