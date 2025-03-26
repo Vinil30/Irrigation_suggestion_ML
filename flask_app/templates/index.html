@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrigation Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            z-index: 2;
+        }
+        .logo {
+            font-size: larger;
+            font-weight: bold;
+        }
+        .header-buttons button {
+            background: #45a049;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 998;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            z-index: 998;
+        }
+        form {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 3vh;
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 70vw;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            text-align: left;
+        }
+        select, input {
+            width: calc(100% - 2vh);
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            display: block;
+            box-sizing: border-box;
+            /* color: rgb(255, 255, 255); */
+            margin: 2vh;
+        }
+        select{
+            color: #6b6a6a;
+        }
+        button {
+            margin-top: 1.5vh;
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 1.5vh;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 95%;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        @media (max-width: 480px) {
+            form {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop class="background-video">
+        <video src="irrigation.mp4" autoplay loop></video>
+    </video>
+    <header>
+        <div class="logo">🌱 AgriPredict</div>
+        <div class="header-buttons">
+            <!-- <button onclick="goToDashboard()">Dashboard</button> -->
+        </div>
+    </header>
+    <div class="container">
+        <form id="predictionForm" action="/predict-irrigation" method="post">
+            <h2>Irrigation Type Prediction</h2>
+            <!-- <label for="crop">Crop Type:</label> -->
+            <select id="crop" required>
+                <option value="">Select Crop</option>
+                <option value="Maize">Maize</option>
+                <option value="Sugarcane">Sugarcane</option>
+                <option value="Cotton">Cotton</option>
+                <option value="Tobacco">Tobacco</option>
+                <option value="Paddy">Paddy</option>
+                <option value="Barley">Barley</option>
+                <option value="Wheat">Wheat</option>
+                <option value="Millets">Millets</option>
+                <option value="Oil seeds">Oil Seeds</option>
+                <option value="Pulses">Pulses</option>
+                <option value="Ground nuts">Ground Nuts</option>
+            </select>
+            <!-- <label for="water">Water Availability:</label> -->
+            <select id="water" required>
+                <option value="">Select Water Availability</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <!-- <label for="rainfall">Rainfall (mm):</label> -->
+            <input type="number" id="rainfall" placeholder="Rainfall in mm" required>
+            <!-- <label for="soil">Soil Type:</label> -->
+            <select id="soil" required>
+                <option value="">Select Soil Type</option>
+                <option value="Black">Black</option>
+                <option value="Red">Red</option>
+                <option value="Sandy">Sandy</option>
+                <option value="Loamy">Loamy</option>
+                <option value="Clay">Clay</option>
+            </select>
+            <!-- <label for="soil_moisture">Soil Moisture ()%</label> -->
+            <input type="number" id="soil_moisture" placeholder="Rainfall in mm" required>
+          
+            <!-- <label for="temperature">Temperature (°C):</label> -->
+            <input type="number" id="temperature" placeholder="Temperature in celsius" required>
+            <!-- <label for="evaporation">Evaporation:</label> -->
+            <input type="number" id="evaporation" placeholder="Evaporation in mm" required>
+            <button type="button" onclick="predictIrrigation()">Predict</button>
+        </form>
+    </div>
+    <script>
+        // Redirect function (optional)
+        function goToDashboard() {
+            window.location.href = "https://your-dashboard-url.com";
+        }
+    
+        // Predict irrigation type by calling the backend API
+        async function predictIrrigation() {
+            // Collect input values from form fields
+            const crop = document.getElementById("crop").value;
+            const water = document.getElementById("water").value;
+            const rainfall = document.getElementById("rainfall").value;
+            const soil_moisture = document.getElementById("soil_moisture").value;
+            const soil = document.getElementById("soil").value;
+            const temperature = document.getElementById("temperature").value;
+            const evaporation = document.getElementById("evaporation").value;
+    
+            // Input validation
+            if (!crop || !water || !soil || !rainfall || !temperature || !evaporation || !soil_moisture) {
+                alert("Please fill in all fields.");
+                return;
+            }
+    
+            // Prepare data to send
+            const requestData = { crop, water, rainfall, soil_moisture, soil, temperature, evaporation };
+    
+            try {
+                const response = await fetch("/predict-irrigation", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestData)
+                });
+    
+                const result = await response.json();
+    
+                if (result.success) {
+                    displayPrediction(result.prediction);
+                } else {
+                    alert("Prediction failed: " + result.error);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error connecting to the server. Please try again later.");
+            }
+        }
+    
+        // Display the prediction result on the page
+        function displayPrediction(predictedIrrigation) {
+            const formContainer = document.getElementById("predictionForm");
+    
+            formContainer.innerHTML = `
+                <h2>Prediction Result: <span style="color: green;">${predictedIrrigation}</span></h2>
+                <p>${getIrrigationDetails(predictedIrrigation)}</p>
+                <button onclick="reloadForm()" style="margin-top: 20px;">Try Again</button>
+            `;
+        }
+    
+        // Provide details about the predicted irrigation type
+        function getIrrigationDetails(type) {
+            const details = {
+                "Furrow Irrigation": "Water flows through furrows between crop rows. It's suitable for row crops like maize and cotton.",
+                "Drip Irrigation": "Delivers water directly to the plant roots, ideal for conserving water and used in orchards, vineyards, and vegetables.",
+                "Border Irrigation": "Water is applied to fields divided by levees or borders. Commonly used for paddy fields or pastures.",
+                "Sprinkler Irrigation": "Sprays water over crops like rainfall, suitable for a variety of crops and soil types."
+            };
+            return details[type] || "No additional details available for this irrigation type.";
+        }
+    
+        // Reload the form to allow another prediction
+        function reloadForm() {
+            const formContainer = document.getElementById("predictionForm");
+    
+            formContainer.innerHTML = `
+                <form id="predictionForm" action="/predict-irrigation" method="post">
+            <h2>Irrigation Type Prediction</h2>
+            <!-- <label for="crop">Crop Type:</label> -->
+            <select id="crop" required>
+                <option value="">Select Crop</option>
+                <option value="Maize">Maize</option>
+                <option value="Sugarcane">Sugarcane</option>
+                <option value="Cotton">Cotton</option>
+                <option value="Tobacco">Tobacco</option>
+                <option value="Paddy">Paddy</option>
+                <option value="Barley">Barley</option>
+                <option value="Wheat">Wheat</option>
+                <option value="Millets">Millets</option>
+                <option value="Oil seeds">Oil Seeds</option>
+                <option value="Pulses">Pulses</option>
+                <option value="Ground nuts">Ground Nuts</option>
+            </select>
+            <!-- <label for="water">Water Availability:</label> -->
+            <select id="water" required>
+                <option value="">Select Water Availability</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+            <!-- <label for="rainfall">Rainfall (mm):</label> -->
+            <input type="number" id="rainfall" placeholder="Rainfall in mm" required>
+             <!-- <label for="soil">Soil Type:</label> -->
+            <select id="soil" required>
+                <option value="">Select Soil Type</option>
+                <option value="Black">Black</option>
+                <option value="Red">Red</option>
+                <option value="Sandy">Sandy</option>
+                <option value="Loamy">Loamy</option>
+                <option value="Clay">Clay</option>
+            </select>
+            <!-- <label for="soil_moisture">Soil Moisture ()%</label> -->
+            <input type="number" id="soil_moisture" placeholder="Rainfall in mm" required>
+          
+            <!-- <label for="temperature">Temperature (°C):</label> -->
+            <input type="number" id="temperature" placeholder="Temperature in celsius" required>
+            <!-- <label for="evaporation">Evaporation:</label> -->
+            <input type="number" id="evaporation" placeholder="Evaporation in mm" required>
+            <button type="button" onclick="predictIrrigation()">Predict</button>
+        </form>
+            `;
+        }
+    
+        // Optional: initialize form when page loads
+        document.addEventListener("DOMContentLoaded", reloadForm);
+    </script>
+    
+</body>
+</html>
