@@ -1,12 +1,14 @@
 import pickle
 import pandas as pd
 import logging
-
+import numpy as np
+import os
+base_dir = os.path.dirname(os.path.abspath(__file__))
 # Load ML Model and Preprocessing Tools
-model_path = r"C:\Users\VINIL\Desktop\irrigation_type\flask_app\models\xgboost_irrigation_model.pkl"
-scaler_path = r"C:\Users\VINIL\Desktop\irrigation_type\flask_app\models\minmax_scaler.pkl"
-encoder_path = r"C:\Users\VINIL\Desktop\irrigation_type\flask_app\models\onehot_encoder.pkl"
-label_encoder_path = r"C:\Users\VINIL\Desktop\irrigation_type\flask_app\models\label_encoder.pkl"
+model_path = os.path.join(base_dir,"models","xgboost_irrigation_model.pkl")
+scaler_path = os.path.join(base_dir,"models","minmax_scaler.pkl")
+encoder_path = os.path.join(base_dir,"models","onehot_encoder.pkl")
+label_encoder_path = os.path.join(base_dir,"models","label_encoder.pkl")
 
 with open(model_path, "rb") as f:
     model = pickle.load(f)

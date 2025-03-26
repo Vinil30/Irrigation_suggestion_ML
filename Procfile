@@ -1,1 +1,1 @@
-web: waitress-serve --host=0.0.0.0 --port=5000 app:app
+waitress-serve --listen=0.0.0.0:5000 run:app
